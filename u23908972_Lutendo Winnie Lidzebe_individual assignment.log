@@ -1,0 +1,217 @@
+--------------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  C:\Users\Lutendo\Desktop\individual assignment\u23908972_Lutendo Winnie Lidzebe_indiv
+> idual assignment.log
+  log type:  text
+ opened on:  19 Apr 2026, 14:51:29
+
+. 
+. import excel "C:\Users\Lutendo\Desktop\individual assignment\Exceldataset.xlsx", sheet("Sheet1")
+>  firstrow case(lower) 
+(4 vars, 6 obs)
+
+. 
+. save "C:\Users\Lutendo\Desktop\individual assignment\u23908972_Lutendo Winnie Lidzebe_individual
+>  assignment.dta", replace 
+file C:\Users\Lutendo\Desktop\individual assignment\u23908972_Lutendo Winnie Lidzebe_individual
+    assignment.dta saved
+
+. 
+. browse  
+
+. 
+end of do-file
+
+. do "C:\Users\Lutendo\AppData\Local\Temp\STD150a8_000001.tmp"
+
+. *QUESTION 1
+. gen pcinc = income/householdsize 
+
+. 
+. *QUESTION 2
+. label var pcinc "Per Capita Income" 
+
+. 
+. *QUESTION 3
+. sum pcinc 
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+       pcinc |          6    169.1667    194.1756         60        560
+
+. 
+. *QUESTION 4
+. mean pcinc 
+
+Mean estimation                              Number of obs = 6
+
+--------------------------------------------------------------
+             |       Mean   Std. err.     [95% conf. interval]
+-------------+------------------------------------------------
+       pcinc |   169.1667   79.27186     -34.60814    372.9415
+--------------------------------------------------------------
+
+. 
+. *QUESTION 5
+. sort region 
+
+. by region: sum pcinc
+
+--------------------------------------------------------------------------------------------------
+-> region = A
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+       pcinc |          4       88.75    41.30678         60        150
+
+--------------------------------------------------------------------------------------------------
+-> region = B
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+       pcinc |          2         330    325.2691        100        560
+
+
+. 
+. ttest pcinc, by (region) 
+
+Two-sample t test with equal variances
+------------------------------------------------------------------------------
+   Group |     Obs        Mean    Std. err.   Std. dev.   [95% conf. interval]
+---------+--------------------------------------------------------------------
+       A |       4       88.75    20.65339    41.30678     23.0217    154.4783
+       B |       2         330         230    325.2691   -2592.427    3252.427
+---------+--------------------------------------------------------------------
+Combined |       6    169.1667    79.27186    194.1756   -34.60814    372.9415
+---------+--------------------------------------------------------------------
+    diff |             -241.25    144.2126               -641.6483    159.1483
+------------------------------------------------------------------------------
+    diff = mean(A) - mean(B)                                      t =  -1.6729
+H0: diff = 0                                     Degrees of freedom =        4
+
+    Ha: diff < 0                 Ha: diff != 0                 Ha: diff > 0
+ Pr(T < t) = 0.0848         Pr(|T| > |t|) = 0.1697          Pr(T > t) = 0.9152
+
+. 
+end of do-file
+
+. do "C:\Users\Lutendo\AppData\Local\Temp\STD150a8_000002.tmp"
+
+. *QUESTION 6
+. generate pline = 100
+
+. label var pline "poverty line" 
+
+. 
+. generate q=0
+
+. 
+. replace q=1 if pcinc < pline 
+(3 real changes made)
+
+. label var q "headcount"
+
+. tab q 
+
+  headcount |      Freq.     Percent        Cum.
+------------+-----------------------------------
+          0 |          3       50.00       50.00
+          1 |          3       50.00      100.00
+------------+-----------------------------------
+      Total |          6      100.00
+
+. 
+. *QUESTION 7 
+. gen pg = q*((pline - pcinc)/pline)^1
+
+. summarize pg  
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+          pg |          6    .1583333    .1800463          0         .4
+
+. 
+. gen pg2 = q*((pline - pcinc)/pline)^2
+
+. mean pg2 
+
+Mean estimation                              Number of obs = 6
+
+--------------------------------------------------------------
+             |       Mean   Std. err.     [95% conf. interval]
+-------------+------------------------------------------------
+         pg2 |   .0520833   .0266647     -.0164605    .1206272
+--------------------------------------------------------------
+
+. 
+end of do-file
+
+. do "C:\Users\Lutendo\AppData\Local\Temp\STD150a8_000003.tmp"
+
+.         
+.         *QUESTION 8
+.         
+.         ifgt pcinc, alpha(0) pline(100)
+
+    Poverty index   :  FGT index
+    Parameter alpha :  0.00
+----------------------------------------------------------------------------------------------
+  Variable   |       Estimate            STE             LB              UB         Pov. line
+-------------+--------------------------------------------------------------------------------
+pcinc        |        0.500000        0.223607       -0.074800        1.074800          100.00
+----------------------------------------------------------------------------------------------
+
+.         ifgt pcinc, alpha(1) pline(100) 
+
+    Poverty index   :  FGT index
+    Parameter alpha :  1.00
+----------------------------------------------------------------------------------------------
+  Variable   |       Estimate            STE             LB              UB         Pov. line
+-------------+--------------------------------------------------------------------------------
+pcinc        |        0.158333        0.073504       -0.030614        0.347280          100.00
+----------------------------------------------------------------------------------------------
+
+.         
+. 
+end of do-file
+
+. do "C:\Users\Lutendo\AppData\Local\Temp\STD150a8_000004.tmp"
+
+.         *QUESTION 9
+.         
+.         gen hr = q*((pline-pcinc)/pline)^0
+
+. summarize hr
+
+    Variable |        Obs        Mean    Std. dev.       Min        Max
+-------------+---------------------------------------------------------
+          hr |          6          .5    .5477226          0          1
+
+. 
+end of do-file
+
+. do "C:\Users\Lutendo\AppData\Local\Temp\STD150a8_000005.tmp"
+
+. tabulate region, sum(hr) means 
+
+            | Summary of
+            |     hr
+     Region |        Mean
+------------+------------
+          A |         .75
+          B |           0
+------------+------------
+      Total |          .5
+
+. 
+end of do-file
+
+. do "C:\Users\Lutendo\AppData\Local\Temp\STD150a8_000006.tmp"
+
+. log close
+      name:  <unnamed>
+       log:  C:\Users\Lutendo\Desktop\individual assignment\u23908972_Lutendo Winnie Lidzebe_indiv
+> idual assignment.log
+  log type:  text
+ closed on:  19 Apr 2026, 14:54:06
+--------------------------------------------------------------------------------------------------
